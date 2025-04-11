@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f44c9e3b59519eb498ef35893e47b5ff, type: 3}
+  m_Name: Keyboard
+  m_EditorClassIdentifier: 
+  itemIcon: {fileID: -6028723803593217043, guid: 4099ad14134092342b860f0318b6665c, type: 3}
+  itemName: Keyboard
+  width: 4
+  height: 2
+  cost: 1000
