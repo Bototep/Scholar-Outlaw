@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ItemGrid : MonoBehaviour
 {
-	public const float tileSizeWidth = 32;
-	public const float tileSizeHeight = 32;
+	public const float tileSizeWidth = 97;
+	public const float tileSizeHeight = 97;
 
 	InventoryItem[,] inventoryItemSlot;
 
@@ -51,7 +51,7 @@ public class ItemGrid : MonoBehaviour
 	Vector2 positionOnTheGrid = new Vector2();
 	Vector2Int tileGridPosition = new Vector2Int();
 
-	public Vector2Int GetTileGridPosition(Vector2 mousePosition)
+	public Vector2Int GetTileGridPosition(Vector2 mousePosition, InventoryItem item = null)
 	{
 		positionOnTheGrid.x = mousePosition.x - rectTransform.position.x;
 		positionOnTheGrid.y = rectTransform.position.y - mousePosition.y;
@@ -59,8 +59,15 @@ public class ItemGrid : MonoBehaviour
 		tileGridPosition.x = (int)(positionOnTheGrid.x / tileSizeWidth);
 		tileGridPosition.y = (int)(positionOnTheGrid.y / tileSizeHeight);
 
+		// Adjust for item dimensions to get the top-left corner
+		if (item != null)
+		{
+			tileGridPosition.x -= (item.WIDTH - 1) / 2;
+			tileGridPosition.y -= (item.HEIGHT - 1) / 2;
+		}
+
 		return tileGridPosition;
-	} 
+	}
 
 	public bool PlaceItem(InventoryItem inventoryItem, int posX, int posY, ref InventoryItem overlapItem)
 	{
@@ -167,12 +174,11 @@ public class ItemGrid : MonoBehaviour
 
 	public bool BoundryCheck(int posX, int posY, int width, int height)
 	{
-		if (PositionCheck(posX, posY) == false) { return false; }
-
-		posX += width-1;
-		posY += height-1;
-
-		if (PositionCheck(posX, posY) == false) { return false; }
+		// Check all four corners of the item
+		if (!PositionCheck(posX, posY)) return false; // top-left
+		if (!PositionCheck(posX + width - 1, posY)) return false; // top-right
+		if (!PositionCheck(posX, posY + height - 1)) return false; // bottom-left
+		if (!PositionCheck(posX + width - 1, posY + height - 1)) return false; // bottom-right
 
 		return true;
 	}

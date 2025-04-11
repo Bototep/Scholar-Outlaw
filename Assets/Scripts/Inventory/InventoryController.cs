@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class InventoryController : MonoBehaviour
 {
 	[SerializeField] private GameObject inventoryPanel;
 	public static InventoryController Instance { get; private set; }
+	public TMP_Text scoreText;
 
 	[HideInInspector]
 	private ItemGrid selectedItemGrid;
@@ -46,12 +48,12 @@ public class InventoryController : MonoBehaviour
 	{
 		ItemIconDrag();
 
-		if (Input.GetKeyDown(KeyCode.Q))
+		if (Input.GetKeyDown(KeyCode.J))
 		{
 			if (selectedItem == null) CreateRandomItem();
 		}
 
-		if (Input.GetKeyDown(KeyCode.W))
+		if (Input.GetKeyDown(KeyCode.K))
 		{
 			InsertRandomItem();
 		}
@@ -61,7 +63,7 @@ public class InventoryController : MonoBehaviour
 			RotateItem();
 		}
 
-		if (Input.GetKeyDown(KeyCode.T)) // Press T to test
+		if (Input.GetKeyDown(KeyCode.L)) // Press T to test
 		{
 			CalculateTotalInventoryValue();
 		}
@@ -120,6 +122,7 @@ public class InventoryController : MonoBehaviour
 		if (posOnGrid == null) { return; }
 
 		selectedItemGrid.PlaceItem(itemToInsert, posOnGrid.Value.x, posOnGrid.Value.y);
+		UpdateScoreText(); // Added here
 	}
 
 	Vector2Int oldPosition;
@@ -210,37 +213,42 @@ public class InventoryController : MonoBehaviour
 		}
 		else
 		{
-			PlaceItem(tileGridPosition);
+			if (selectedItemGrid.BoundryCheck(tileGridPosition.x, tileGridPosition.y,
+				selectedItem.WIDTH, selectedItem.HEIGHT))
+			{
+				PlaceItem(tileGridPosition);
+			}
 		}
+		UpdateScoreText(); // Added here
 	}
 
 	private Vector2Int GetTileGridPosition()
 	{
-		Vector2 position = Input.mousePosition;
-
-		if (selectedItem != null)
-		{
-			position.x -= (selectedItem.WIDTH - 1) * ItemGrid.tileSizeWidth / 2;
-			position.y += (selectedItem.HEIGHT - 1) * ItemGrid.tileSizeHeight / 2;
-		}
-
-		return selectedItemGrid.GetTileGridPosition(Input.mousePosition); 
+		return selectedItemGrid.GetTileGridPosition(Input.mousePosition, selectedItem);
 	}
 
 	private void PlaceItem(Vector2Int tileGridPosition)
 	{
-		bool complete = selectedItemGrid.PlaceItem(selectedItem, tileGridPosition.x, tileGridPosition.y, ref overlapItem);
+		if (!selectedItemGrid.BoundryCheck(tileGridPosition.x, tileGridPosition.y,
+			selectedItem.WIDTH, selectedItem.HEIGHT))
+		{
+			return;
+		}
+
+		bool complete = selectedItemGrid.PlaceItem(selectedItem, tileGridPosition.x,
+			tileGridPosition.y, ref overlapItem);
 		if (complete)
 		{
 			selectedItem = null;
-			if(overlapItem != null)
+			if (overlapItem != null)
 			{
-				selectedItem= overlapItem;
+				selectedItem = overlapItem;
 				overlapItem = null;
 				rectTransform = selectedItem.GetComponent<RectTransform>();
 				rectTransform.SetAsLastSibling();
 			}
 		}
+		UpdateScoreText(); // Added here
 	}
 
 	private void PickUpItem(Vector2Int tileGridPosition)
@@ -250,6 +258,7 @@ public class InventoryController : MonoBehaviour
 		{
 			rectTransform = selectedItem.GetComponent<RectTransform>();
 		}
+		UpdateScoreText(); // Added here
 	}
 
 	public void ToggleInventory(bool show)
@@ -257,6 +266,7 @@ public class InventoryController : MonoBehaviour
 		if (inventoryPanel != null)
 		{
 			inventoryPanel.SetActive(show);
+			if (show) UpdateScoreText(); // Only update when opening
 		}
 	}
 
@@ -313,5 +323,31 @@ public class InventoryController : MonoBehaviour
 		}
 
 		Debug.Log($"Inventory contains {itemCount} items worth {totalValue} total");
+	}
+
+	private void UpdateScoreText()
+	{
+		if (scoreText == null) return;
+
+		int totalValue = 0;
+		if (selectedItemGrid != null)
+		{
+			for (int x = 0; x < selectedItemGrid.gridSizeWidth; x++)
+			{
+				for (int y = 0; y < selectedItemGrid.gridSizeHeight; y++)
+				{
+					InventoryItem item = selectedItemGrid.GetItem(x, y) as InventoryItem;
+					if (item != null && item.itemData != null)
+					{
+						if (item.onGridPositionX == x && item.onGridPositionY == y)
+						{
+							totalValue += item.itemData.cost;
+						}
+					}
+				}
+			}
+		}
+
+		scoreText.text = $"{totalValue}";
 	}
 }
