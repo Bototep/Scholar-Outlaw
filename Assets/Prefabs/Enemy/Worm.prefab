@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 5433220668101407274}
   m_Layer: 0
   m_Name: Worm
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,11 +105,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waypoint: {fileID: 0}
-  patrolSpeed: 2
-  chaseSpeed: 3
+  patrolSpeed: 1
+  chaseSpeed: 4
   reachThreshold: 0.3
   visionAngle: 49
-  visionDistance: 7.25
+  visionDistance: 5
   visionBlockingLayers:
     serializedVersion: 2
     m_Bits: 64

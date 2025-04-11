@@ -355,10 +355,21 @@ public class InventoryController : MonoBehaviour
 					if (item != null)
 					{
 						Destroy(item.gameObject);
+						selectedItemGrid.CleanGridReference(x, y);
 					}
 				}
 			}
 		}
-		UpdateScoreText();
+
+		if (scoreText != null)
+		{
+			scoreText.text = newScore.ToString();
+		}
+
+		if (selectedItem != null)
+		{
+			Destroy(selectedItem.gameObject);
+			selectedItem = null;
+		}
 	}
 }

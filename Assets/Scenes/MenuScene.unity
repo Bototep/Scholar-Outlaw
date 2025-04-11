@@ -784,9 +784,33 @@ MonoBehaviour:
   - type: 0
     settings:
       name: 
-      clip: {fileID: 0}
-      volume: 0
-      pitch: 0
+      clip: {fileID: 8300000, guid: 1299aa1d2cf10104badb9eb3feb31604, type: 3}
+      volume: 0.718
+      pitch: 1.74
+      loop: 0
+      source: {fileID: 0}
+  - type: 1
+    settings:
+      name: 
+      clip: {fileID: 8300000, guid: 2d5cdfbc3300fe74aa32f6c450433f73, type: 3}
+      volume: 0.538
+      pitch: 1.56
+      loop: 0
+      source: {fileID: 0}
+  - type: 2
+    settings:
+      name: 
+      clip: {fileID: 8300000, guid: c777520c4f35b4445b0c37fd6d5831f4, type: 3}
+      volume: 0.53
+      pitch: 1.69
+      loop: 0
+      source: {fileID: 0}
+  - type: 3
+    settings:
+      name: 
+      clip: {fileID: 8300000, guid: 2dfdc7f38f83db94098236155433b297, type: 3}
+      volume: 0.521
+      pitch: 1.61
       loop: 0
       source: {fileID: 0}
 --- !u!1 &818757636

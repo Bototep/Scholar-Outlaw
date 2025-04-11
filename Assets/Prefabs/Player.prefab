@@ -302,12 +302,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944651b6ed24b9b49b8c700ff5a9d484, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  sprintSpeed: 8
+  moveSpeed: 2
+  sprintSpeed: 3
   canMove: 1
   inventoryPanel: {fileID: 0}
   soundDetector: {fileID: 2931824565191817647}
   sprintSoundRadius: 2.5
+  footstepSound: {fileID: 8300000, guid: 7d099d16ca9abe44fb43316ac4a1ce6e, type: 3}
+  footstepVolume: 0.5
+  walkPitch: 0.76
+  sprintPitch: 1.2
+  footstepIntervalWalk: 0.5
+  footstepIntervalSprint: 0.3
   movement: {x: 0, y: 0}
 --- !u!114 &4460075828814371030
 MonoBehaviour:

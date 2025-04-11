@@ -187,6 +187,11 @@ public class ItemGrid : MonoBehaviour
 		return inventoryItemSlot[x, y];
 	}
 
+	public void CleanGridReference(int posX, int posY)
+	{
+		inventoryItemSlot[posX, posY] = null;
+	}
+
 	public bool IsPositionInGrid(Vector2Int gridPosition)
 	{
 		return PositionCheck(gridPosition.x, gridPosition.y);

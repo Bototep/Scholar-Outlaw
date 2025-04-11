@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static SoundManager;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -12,10 +13,21 @@ public class PlayerMovement : MonoBehaviour
 	public GameObject soundDetector;
 	public float sprintSoundRadius = 5f;
 
+	[Header("Footstep Sounds")]
+	public AudioClip footstepSound;
+	[Range(0f, 1f)] public float footstepVolume = 0.5f;
+	[Range(0.1f, 3f)] public float walkPitch = 1f;
+	[Range(0.1f, 3f)] public float sprintPitch = 1.2f;
+	public float footstepIntervalWalk = 0.5f;
+	public float footstepIntervalSprint = 0.3f;
+
 	private Rigidbody2D rb;
 	public Vector2 movement;
 	private bool isSprinting;
 	private bool wasSprintingLastFrame;
+	private AudioSource footstepSource;
+	private float nextFootstepTime;
+	private bool wasMovingLastFrame;
 
 	private void Start()
 	{
@@ -24,6 +36,12 @@ public class PlayerMovement : MonoBehaviour
 		{
 			soundDetector.SetActive(false);
 		}
+
+		footstepSource = gameObject.AddComponent<AudioSource>();
+		footstepSource.clip = footstepSound;
+		footstepSource.volume = footstepVolume;
+		footstepSource.loop = false;
+		footstepSource.playOnAwake = false;
 	}
 
 	private void Update()
@@ -48,6 +66,8 @@ public class PlayerMovement : MonoBehaviour
 		{
 			UpdateSoundDetector();
 		}
+
+		HandleFootstepSounds();
 	}
 
 	private void FixedUpdate()
@@ -72,6 +92,40 @@ public class PlayerMovement : MonoBehaviour
 		rb.MovePosition(rb.position + movement * currentSpeed * Time.fixedDeltaTime);
 	}
 
+	private void HandleFootstepSounds()
+	{
+		bool isMoving = movement.magnitude > 0.1f && canMove;
+
+		if (isMoving != wasMovingLastFrame)
+		{
+			if (isMoving)
+			{
+				PlayFootstep();
+				nextFootstepTime = Time.time + (isSprinting ? footstepIntervalSprint : footstepIntervalWalk);
+			}
+			else
+			{
+				footstepSource.Stop();
+			}
+		}
+
+		if (isMoving && Time.time >= nextFootstepTime)
+		{
+			PlayFootstep();
+			nextFootstepTime = Time.time + (isSprinting ? footstepIntervalSprint : footstepIntervalWalk);
+		}
+
+		wasMovingLastFrame = isMoving;
+	}
+
+	private void PlayFootstep()
+	{
+		if (footstepSound == null) return;
+
+		footstepSource.pitch = isSprinting ? sprintPitch : walkPitch;
+		footstepSource.PlayOneShot(footstepSound);
+	}
+
 	private void UpdateSoundDetector()
 	{
 		if (soundDetector != null)
@@ -93,6 +147,11 @@ public class PlayerMovement : MonoBehaviour
 			inventoryPanel.SetActive(openingInventory);
 			canMove = !inventoryPanel.activeSelf;
 
+			if (SoundManager.Instance != null)
+			{
+				SoundManager.Instance.Play(SoundType.Bonus);
+			}
+
 			if (inventoryPanel.activeSelf && isSprinting)
 			{
 				isSprinting = false;
@@ -101,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	private void LoadGameOverScene(bool killedByEnemy)
+	public void LoadGameOverScene(bool killedByEnemy)
 	{
 		if (InventoryController.Instance != null)
 		{
@@ -114,22 +173,28 @@ public class PlayerMovement : MonoBehaviour
 		SceneManager.LoadScene(2);
 	}
 
-	private void OnCollisionEnter2D(Collision2D collision)
-	{
-		if (collision.gameObject.CompareTag("Enemy"))
-		{
-			LoadGameOverScene(true);
-		}
-	}
-
 	private void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.CompareTag("Enemy"))
 		{
+			if (SoundManager.Instance != null)
+			{
+				SoundManager.Instance.Play(SoundType.Death);
+			}
+
+			if (InventoryController.Instance != null)
+			{
+				InventoryController.Instance.ForceSetScore(0);
+			}
+
 			LoadGameOverScene(true);
 		}
 		else if (other.CompareTag("ExtractionPoint"))
 		{
+			if (SoundManager.Instance != null)
+			{
+				SoundManager.Instance.Play(SoundType.Pickup);
+			}
 			LoadGameOverScene(false);
 		}
 	}

@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class CSVReader : MonoBehaviour
 {
@@ -10,6 +10,8 @@ public class CSVReader : MonoBehaviour
 	[ContextMenu("Load CSV Data")]
 	public void LoadCSVData()
 	{
+		// This method should only work in the Editor
+#if UNITY_EDITOR
 		if (csvFile == null)
 		{
 			Debug.LogError("CSV file is missing!");
@@ -51,12 +53,12 @@ public class CSVReader : MonoBehaviour
 			string itemName = columns[0].Trim();
 			string assetPath = $"{itemFolderPath}/{itemName}.asset";
 
-			ItemData itemData = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
+			ItemData itemData = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
 
 			if (itemData == null)
 			{
 				itemData = ScriptableObject.CreateInstance<ItemData>();
-				AssetDatabase.CreateAsset(itemData, assetPath);
+				UnityEditor.AssetDatabase.CreateAsset(itemData, assetPath);
 			}
 
 			itemData.itemName = itemName;
@@ -64,16 +66,18 @@ public class CSVReader : MonoBehaviour
 			itemData.height = int.Parse(columns[2].Trim());
 			itemData.cost = int.Parse(columns[3].Trim());
 
-			EditorUtility.SetDirty(itemData);
+			UnityEditor.EditorUtility.SetDirty(itemData);
 		}
 
-		AssetDatabase.SaveAssets();
-		AssetDatabase.Refresh();
+		UnityEditor.AssetDatabase.SaveAssets();
+		UnityEditor.AssetDatabase.Refresh();
 		Debug.Log($"Successfully processed {validItemNames.Count} items");
+#endif
 	}
 
 	private void CleanUnusedItems(string folderPath, HashSet<string> validNames)
 	{
+#if UNITY_EDITOR
 		string[] existingItems = Directory.GetFiles(folderPath, "*.asset");
 
 		foreach (var itemPath in existingItems)
@@ -81,35 +85,37 @@ public class CSVReader : MonoBehaviour
 			string fileName = Path.GetFileNameWithoutExtension(itemPath);
 			if (!validNames.Contains(fileName))
 			{
-				AssetDatabase.DeleteAsset(itemPath);
+				UnityEditor.AssetDatabase.DeleteAsset(itemPath);
 			}
 		}
+#endif
 	}
+}
 
 #if UNITY_EDITOR
-	[CustomEditor(typeof(CSVReader))]
-	public class CSVReaderEditor : Editor
+
+[CustomEditor(typeof(CSVReader))]
+public class CSVReaderEditor : Editor
+{
+	public override void OnInspectorGUI()
 	{
-		public override void OnInspectorGUI()
+		DrawDefaultInspector();
+
+		CSVReader reader = (CSVReader)target;
+
+		EditorGUILayout.Space();
+
+		GUI.enabled = reader.csvFile != null;
+		if (GUILayout.Button("Load CSV Data", GUILayout.Height(30)))
 		{
-			DrawDefaultInspector();
+			reader.LoadCSVData();
+		}
+		GUI.enabled = true;
 
-			CSVReader reader = (CSVReader)target;
-
-			EditorGUILayout.Space();
-
-			GUI.enabled = reader.csvFile != null;
-			if (GUILayout.Button("Load CSV Data", GUILayout.Height(30)))
-			{
-				reader.LoadCSVData();
-			}
-			GUI.enabled = true;
-
-			if (reader.csvFile == null)
-			{
-				EditorGUILayout.HelpBox("Assign a CSV file to begin", MessageType.Warning);
-			}
+		if (reader.csvFile == null)
+		{
+			EditorGUILayout.HelpBox("Assign a CSV file to begin", MessageType.Warning);
 		}
 	}
-#endif
 }
+#endif

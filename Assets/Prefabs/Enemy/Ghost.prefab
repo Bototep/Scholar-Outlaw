@@ -105,11 +105,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waypoint: {fileID: 0}
-  patrolSpeed: 3
-  chaseSpeed: 5
+  patrolSpeed: 1.5
+  chaseSpeed: 4
   reachThreshold: 0.3
   visionAngle: 49
-  visionDistance: 7.25
+  visionDistance: 6
   visionBlockingLayers:
     serializedVersion: 2
     m_Bits: 64

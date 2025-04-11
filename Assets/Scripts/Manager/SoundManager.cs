@@ -17,7 +17,7 @@ public class SoundManager : MonoBehaviour
 		public AudioSource source;
 	}
 
-	public enum SoundType { Run, Press, Jump } 
+	public enum SoundType { Death, Pickup, Ghost, Bonus }
 
 	[System.Serializable]
 	public class SoundEntry
@@ -49,12 +49,12 @@ public class SoundManager : MonoBehaviour
 	{
 		foreach (SoundEntry entry in soundEntries)
 		{
-			entry.settings.name = entry.type.ToString();
 			entry.settings.source = gameObject.AddComponent<AudioSource>();
 			entry.settings.source.clip = entry.settings.clip;
 			entry.settings.source.volume = entry.settings.volume;
 			entry.settings.source.pitch = entry.settings.pitch;
 			entry.settings.source.loop = entry.settings.loop;
+			entry.settings.source.playOnAwake = false; 
 		}
 	}
 
@@ -80,7 +80,8 @@ public class SoundManager : MonoBehaviour
 		entry.settings.source.Stop();
 	}
 
-	public void PlayRunSound() => Play(SoundType.Run);
-	public void PlayPressSound() => Play(SoundType.Press);
-	public void PlayJumpSound() => Play(SoundType.Jump);
+	public void PlayDeathSound() => Play(SoundType.Death);
+	public void PlayPickupSound() => Play(SoundType.Pickup);
+	public void PlayGhostSound() => Play(SoundType.Ghost);
+	public void PlayBonusSound() => Play(SoundType.Bonus);
 }
