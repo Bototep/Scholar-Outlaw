@@ -6,6 +6,7 @@ public class ItemPickup : MonoBehaviour
 	[SerializeField] private LayerMask playerLayer;
 	private bool isPlayerInRange = false;
 
+	[System.Obsolete]
 	private void Update()
 	{
 		if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
@@ -14,21 +15,19 @@ public class ItemPickup : MonoBehaviour
 		}
 	}
 
+	[System.Obsolete]
 	private void TryPickUpItem()
 	{
-		// Get references
 		PlayerMovement player = FindObjectOfType<PlayerMovement>();
 		InventoryController inventory = InventoryController.Instance;
 
 		if (player == null || inventory == null) return;
 
-		// Open inventory if closed
 		if (player.inventoryPanel != null && !player.inventoryPanel.activeSelf)
 		{
 			player.ToggleInventory();
 		}
 
-		// Create and attach item to mouse
 		InventoryItem inventoryItem = Instantiate(inventory.itemPrefab).GetComponent<InventoryItem>();
 		inventoryItem.Set(itemData);
 
@@ -36,7 +35,7 @@ public class ItemPickup : MonoBehaviour
 		inventory.rectTransform = inventoryItem.GetComponent<RectTransform>();
 		inventory.rectTransform.SetParent(inventory.canvasTransform);
 
-		Destroy(gameObject); // Remove world item
+		Destroy(gameObject); 
 	}
 
 	private void OnTriggerEnter2D(Collider2D other)

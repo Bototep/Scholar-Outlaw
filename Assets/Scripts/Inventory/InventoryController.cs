@@ -12,12 +12,14 @@ public class InventoryController : MonoBehaviour
 	[HideInInspector]
 	private ItemGrid selectedItemGrid;
 
-	public ItemGrid SelectedItemGrid {
+	public ItemGrid SelectedItemGrid
+	{
 		get => selectedItemGrid;
-		set{
+		set
+		{
 			selectedItemGrid = value;
 			inventoryHighlight.SetParent(value);
-		} 
+		}
 	}
 
 	public InventoryItem selectedItem;
@@ -63,7 +65,7 @@ public class InventoryController : MonoBehaviour
 			RotateItem();
 		}
 
-		if (Input.GetKeyDown(KeyCode.L)) // Press T to test
+		if (Input.GetKeyDown(KeyCode.L))
 		{
 			CalculateTotalInventoryValue();
 		}
@@ -101,28 +103,25 @@ public class InventoryController : MonoBehaviour
 
 	private void RotateItem()
 	{
-		if (selectedItem == null) { return; }
-
+		if (selectedItem == null) return;
 		selectedItem.Rotate();
 	}
 
 	private void InsertRandomItem()
 	{
-		if(selectedItemGrid == null) { return; }
-
+		if (selectedItemGrid == null) return;
 		CreateRandomItem();
 		InventoryItem itemToInsert = selectedItem;
-		selectedItem= null;
+		selectedItem = null;
 		InsertItem(itemToInsert);
 	}
 
 	public void InsertItem(InventoryItem itemToInsert)
 	{
 		Vector2Int? posOnGrid = selectedItemGrid.FindSpaceForObject(itemToInsert);
-		if (posOnGrid == null) { return; }
-
+		if (posOnGrid == null) return;
 		selectedItemGrid.PlaceItem(itemToInsert, posOnGrid.Value.x, posOnGrid.Value.y);
-		UpdateScoreText(); // Added here
+		UpdateScoreText();
 	}
 
 	Vector2Int oldPosition;
@@ -130,9 +129,9 @@ public class InventoryController : MonoBehaviour
 	private void HandleHighlight()
 	{
 		Vector2Int positionOnGrid = GetTileGridPosition();
-		if(oldPosition == positionOnGrid) { return; }
+		if (oldPosition == positionOnGrid) return;
 
-		oldPosition= positionOnGrid;
+		oldPosition = positionOnGrid;
 		if (selectedItem == null)
 		{
 			itemToHighlight = (InventoryItem)selectedItemGrid.GetItem(positionOnGrid.x, positionOnGrid.y);
@@ -141,7 +140,6 @@ public class InventoryController : MonoBehaviour
 			{
 				inventoryHighlight.Show(true);
 				inventoryHighlight.SetSize(itemToHighlight);
-				//inventoryHighlight.SetParent(selectedItemGrid);
 				inventoryHighlight.SetPostion(selectedItemGrid, itemToHighlight);
 			}
 			else
@@ -152,13 +150,11 @@ public class InventoryController : MonoBehaviour
 		else
 		{
 			inventoryHighlight.Show(selectedItemGrid.BoundryCheck(
-				positionOnGrid.x, 
+				positionOnGrid.x,
 				positionOnGrid.y,
 				selectedItem.WIDTH,
-				selectedItem.HEIGHT)
-				);
+				selectedItem.HEIGHT));
 			inventoryHighlight.SetSize(selectedItem);
-			//inventoryHighlight.SetParent(selectedItemGrid);
 			inventoryHighlight.SetPostion(selectedItemGrid, selectedItem, positionOnGrid.x, positionOnGrid.y);
 		}
 	}
@@ -167,46 +163,33 @@ public class InventoryController : MonoBehaviour
 	{
 		InventoryItem inventoryItem = Instantiate(itemPrefab).GetComponent<InventoryItem>();
 		selectedItem = inventoryItem;
-
-		Debug.Log("adwad");
-
 		rectTransform = inventoryItem.GetComponent<RectTransform>();
 		rectTransform.SetParent(canvasTransform);
 		rectTransform.SetAsLastSibling();
-
-
 		int selectedItemID = UnityEngine.Random.Range(0, items.Count);
 		inventoryItem.Set(items[selectedItemID]);
 	}
 
 	public bool AddItemToInventory(ItemData itemData)
 	{
-		// Create the item
 		InventoryItem inventoryItem = Instantiate(itemPrefab).GetComponent<InventoryItem>();
 		rectTransform = inventoryItem.GetComponent<RectTransform>();
 		rectTransform.SetParent(canvasTransform);
 		rectTransform.SetAsLastSibling();
-
-		// Set up the item
 		inventoryItem.Set(itemData);
-
-		// Try to place it in inventory
 		selectedItem = inventoryItem;
 		InsertItem(inventoryItem);
-
-		// Return whether the item was successfully placed
 		if (inventoryItem.transform.parent == null)
 		{
 			Destroy(inventoryItem.gameObject);
-			return false; // Failed to add
+			return false;
 		}
-		return true; // Successfully added
+		return true;
 	}
 
 	private void LeftMouseButtonPress()
 	{
 		Vector2Int tileGridPosition = GetTileGridPosition();
-
 		if (selectedItem == null)
 		{
 			PickUpItem(tileGridPosition);
@@ -219,7 +202,7 @@ public class InventoryController : MonoBehaviour
 				PlaceItem(tileGridPosition);
 			}
 		}
-		UpdateScoreText(); // Added here
+		UpdateScoreText();
 	}
 
 	private Vector2Int GetTileGridPosition()
@@ -248,7 +231,7 @@ public class InventoryController : MonoBehaviour
 				rectTransform.SetAsLastSibling();
 			}
 		}
-		UpdateScoreText(); // Added here
+		UpdateScoreText();
 	}
 
 	private void PickUpItem(Vector2Int tileGridPosition)
@@ -258,7 +241,7 @@ public class InventoryController : MonoBehaviour
 		{
 			rectTransform = selectedItem.GetComponent<RectTransform>();
 		}
-		UpdateScoreText(); // Added here
+		UpdateScoreText();
 	}
 
 	public void ToggleInventory(bool show)
@@ -266,7 +249,7 @@ public class InventoryController : MonoBehaviour
 		if (inventoryPanel != null)
 		{
 			inventoryPanel.SetActive(show);
-			if (show) UpdateScoreText(); // Only update when opening
+			if (show) UpdateScoreText();
 		}
 	}
 
@@ -284,27 +267,18 @@ public class InventoryController : MonoBehaviour
 		{
 			if (selectedItem != null)
 			{
-				// Optional: Add effect here
-				Debug.Log("Discarding " + selectedItem.itemData.name);
 				Destroy(selectedItem.gameObject);
 				selectedItem = null;
 			}
-
 			inventoryPanel.SetActive(false);
 		}
 	}
 
 	public void CalculateTotalInventoryValue()
 	{
-		if (selectedItemGrid == null)
-		{
-			Debug.Log("No inventory grid selected");
-			return;
-		}
+		if (selectedItemGrid == null) return;
 
 		int totalValue = 0;
-		int itemCount = 0;
-
 		for (int x = 0; x < selectedItemGrid.gridSizeWidth; x++)
 		{
 			for (int y = 0; y < selectedItemGrid.gridSizeHeight; y++)
@@ -312,17 +286,13 @@ public class InventoryController : MonoBehaviour
 				InventoryItem item = selectedItemGrid.GetItem(x, y) as InventoryItem;
 				if (item != null && item.itemData != null)
 				{
-					// Only count if this is the top-left corner of the item
 					if (item.onGridPositionX == x && item.onGridPositionY == y)
 					{
 						totalValue += item.itemData.cost;
-						itemCount++;
 					}
 				}
 			}
 		}
-
-		Debug.Log($"Inventory contains {itemCount} items worth {totalValue} total");
 	}
 
 	private void UpdateScoreText()
@@ -347,7 +317,48 @@ public class InventoryController : MonoBehaviour
 				}
 			}
 		}
-
 		scoreText.text = $"{totalValue}";
+	}
+
+	public void FinishGame()
+	{
+		int totalValue = 0;
+		if (selectedItemGrid != null)
+		{
+			for (int x = 0; x < selectedItemGrid.gridSizeWidth; x++)
+			{
+				for (int y = 0; y < selectedItemGrid.gridSizeHeight; y++)
+				{
+					InventoryItem item = selectedItemGrid.GetItem(x, y) as InventoryItem;
+					if (item != null && item.itemData != null)
+					{
+						if (item.onGridPositionX == x && item.onGridPositionY == y)
+						{
+							totalValue += item.itemData.cost;
+						}
+					}
+				}
+			}
+		}
+		GameManager.Instance.SaveScore(totalValue);
+	}
+
+	public void ForceSetScore(int newScore)
+	{
+		if (selectedItemGrid != null)
+		{
+			for (int x = 0; x < selectedItemGrid.gridSizeWidth; x++)
+			{
+				for (int y = 0; y < selectedItemGrid.gridSizeHeight; y++)
+				{
+					InventoryItem item = selectedItemGrid.GetItem(x, y) as InventoryItem;
+					if (item != null)
+					{
+						Destroy(item.gameObject);
+					}
+				}
+			}
+		}
+		UpdateScoreText();
 	}
 }

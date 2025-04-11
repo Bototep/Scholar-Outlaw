@@ -7,7 +7,7 @@ public class SoundManager : MonoBehaviour
 	[System.Serializable]
 	public class Sound
 	{
-		[HideInInspector] public string name;  // Name is now controlled by the enum
+		[HideInInspector] public string name;
 		public AudioClip clip;
 		[Range(0f, 1f)] public float volume = 1f;
 		[Range(0.1f, 3f)] public float pitch = 1f;
@@ -17,7 +17,7 @@ public class SoundManager : MonoBehaviour
 		public AudioSource source;
 	}
 
-	public enum SoundType { Run, Press } // Add more sound types here as needed
+	public enum SoundType { Run, Press, Jump } 
 
 	[System.Serializable]
 	public class SoundEntry
@@ -30,19 +30,23 @@ public class SoundManager : MonoBehaviour
 
 	private void Awake()
 	{
-		// Singleton pattern
+		transform.SetParent(null);
+
 		if (Instance == null)
 		{
 			Instance = this;
 			DontDestroyOnLoad(gameObject);
+			InitializeAudioSources();
 		}
-		else
+		else if (Instance != this)
 		{
 			Destroy(gameObject);
 			return;
 		}
+	}
 
-		// Create audio sources for each sound
+	private void InitializeAudioSources()
+	{
 		foreach (SoundEntry entry in soundEntries)
 		{
 			entry.settings.name = entry.type.ToString();
@@ -59,7 +63,7 @@ public class SoundManager : MonoBehaviour
 		SoundEntry entry = System.Array.Find(soundEntries, e => e.type == soundType);
 		if (entry == null)
 		{
-			Debug.LogWarning("Sound type: " + soundType + " not found!");
+			Debug.LogWarning($"Sound type: {soundType} not found!");
 			return;
 		}
 		entry.settings.source.Play();
@@ -70,13 +74,13 @@ public class SoundManager : MonoBehaviour
 		SoundEntry entry = System.Array.Find(soundEntries, e => e.type == soundType);
 		if (entry == null)
 		{
-			Debug.LogWarning("Sound type: " + soundType + " not found!");
+			Debug.LogWarning($"Sound type: {soundType} not found!");
 			return;
 		}
 		entry.settings.source.Stop();
 	}
 
-	// Specific sound methods for convenience
 	public void PlayRunSound() => Play(SoundType.Run);
 	public void PlayPressSound() => Play(SoundType.Press);
+	public void PlayJumpSound() => Play(SoundType.Jump);
 }

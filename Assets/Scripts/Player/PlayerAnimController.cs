@@ -59,15 +59,14 @@ public class PlayerAnimController : MonoBehaviour
 
 	private void PlayWalkAnimation(Vector2 movement)
 	{
-		// Prioritize Up/Down over Side when moving diagonally
-		if (movement.y != 0) // If there's any vertical movement
+		if (movement.y != 0)
 		{
 			if (movement.y > 0)
 				animator.Play("WalkUp");
 			else
 				animator.Play("WalkDown");
 		}
-		else // Pure horizontal movement
+		else 
 		{
 			animator.Play("WalkSide");
 			spriteRenderer.flipX = movement.x < 0;

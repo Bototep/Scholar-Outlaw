@@ -62,7 +62,6 @@ public class Enemy : MonoBehaviour
 
 		if (!waypoint || waypoint.Points.Length == 0) return;
 
-		// Handle paused state
 		if (_isPaused)
 		{
 			if (Time.time >= _pauseEndTime)
@@ -73,13 +72,12 @@ public class Enemy : MonoBehaviour
 			return;
 		}
 
-		// Handle alert state
 		if (_isAlerted)
 		{
 			if (Time.time >= _alertEndTime)
 			{
 				_isAlerted = false;
-				StartChase(); // This was missing - transition to chase after alert
+				StartChase(); 
 			}
 			return;
 		}
@@ -114,7 +112,7 @@ public class Enemy : MonoBehaviour
 		if (_currentAnimationState == newState) return;
 
 		_currentAnimationState = newState;
-		_animator.CrossFade(newState, 0.9f); // 0.1f is the transition duration
+		_animator.CrossFade(newState, 0.9f); 
 	}
 
 	private void HandlePlayerDetection()
@@ -142,8 +140,8 @@ public class Enemy : MonoBehaviour
 		_isAlerted = true;
 		_alertEndTime = Time.time + alertDuration;
 		_lastWaypointPosition = waypoint.CurrentPosition + waypoint.Points[_currentWaypointIndex];
-		_agent.speed = 0; // Stop moving
-		_agent.isStopped = true; // Ensure the agent actually stops
+		_agent.speed = 0; 
+		_agent.isStopped = true;
 		UpdateAnimationState("Alert");
 	}
 
@@ -154,10 +152,8 @@ public class Enemy : MonoBehaviour
 		Vector2 directionToPlayer = (Vector2)(player.position - transform.position);
 		float distanceToPlayer = directionToPlayer.magnitude;
 
-		// First check if object has Player tag (simpler than raycast)
 		if (player.CompareTag("Player") && distanceToPlayer <= visionDistance)
 		{
-			// Then verify line of sight
 			float angleToPlayer = Vector2.Angle(_currentFacingDirection, directionToPlayer);
 			if (angleToPlayer > visionAngle * 0.5f) return false;
 
@@ -188,7 +184,7 @@ public class Enemy : MonoBehaviour
 	private void StartChase()
 	{
 		_isChasing = true;
-		_agent.isStopped = false; // Ensure the agent can move again
+		_agent.isStopped = false; 
 		_agent.speed = chaseSpeed;
 		UpdateAnimationState("Move");
 	}
@@ -280,19 +276,15 @@ public class Enemy : MonoBehaviour
 
 	private bool CanHearPlayer()
 	{
-		// Only check if player is moving (you'll need to track player movement)
 		if (player.GetComponent<Rigidbody2D>().linearVelocity.magnitude < 0.1f)
 			return false;
 
-		// Check distance
 		float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 		if (distanceToPlayer > visionDistance) return false;
 
-		// Optional: Add hearing-specific distance that's smaller than vision
 		float hearingDistance = visionDistance * 0.7f;
 		if (distanceToPlayer > hearingDistance) return false;
 
-		// Verify line of sight (sound is blocked by walls)
 		RaycastHit2D hit = Physics2D.Raycast(
 			transform.position,
 			(player.position - transform.position).normalized,
@@ -335,7 +327,7 @@ public class Enemy : MonoBehaviour
 	{
 		if (other.CompareTag("Player"))
 		{
-			player = other.transform; // Ensure player reference is set
+			player = other.transform;
 			if (!_isChasing && !_isAlerted)
 			{
 				StartAlert();

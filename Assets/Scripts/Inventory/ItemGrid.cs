@@ -59,7 +59,6 @@ public class ItemGrid : MonoBehaviour
 		tileGridPosition.x = (int)(positionOnTheGrid.x / tileSizeWidth);
 		tileGridPosition.y = (int)(positionOnTheGrid.y / tileSizeHeight);
 
-		// Adjust for item dimensions to get the top-left corner
 		if (item != null)
 		{
 			tileGridPosition.x -= (item.WIDTH - 1) / 2;
@@ -174,11 +173,10 @@ public class ItemGrid : MonoBehaviour
 
 	public bool BoundryCheck(int posX, int posY, int width, int height)
 	{
-		// Check all four corners of the item
-		if (!PositionCheck(posX, posY)) return false; // top-left
-		if (!PositionCheck(posX + width - 1, posY)) return false; // top-right
-		if (!PositionCheck(posX, posY + height - 1)) return false; // bottom-left
-		if (!PositionCheck(posX + width - 1, posY + height - 1)) return false; // bottom-right
+		if (!PositionCheck(posX, posY)) return false;
+		if (!PositionCheck(posX + width - 1, posY)) return false; 
+		if (!PositionCheck(posX, posY + height - 1)) return false; 
+		if (!PositionCheck(posX + width - 1, posY + height - 1)) return false;
 
 		return true;
 	}

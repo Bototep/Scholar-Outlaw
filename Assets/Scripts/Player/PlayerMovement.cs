@@ -1,27 +1,28 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
 	public float moveSpeed = 5f;
-	public float sprintSpeed = 8f;  // Speed when sprinting
+	public float sprintSpeed = 8f;
 	public bool canMove = true;
 	public GameObject inventoryPanel;
 
 	[Header("Sound Detection")]
-	public GameObject soundDetector; // Assign the child GameObject in Inspector
+	public GameObject soundDetector;
 	public float sprintSoundRadius = 5f;
 
 	private Rigidbody2D rb;
 	public Vector2 movement;
 	private bool isSprinting;
-	private bool wasSprintingLastFrame; // To track state changes
+	private bool wasSprintingLastFrame;
 
 	private void Start()
 	{
 		rb = GetComponent<Rigidbody2D>();
 		if (soundDetector != null)
 		{
-			soundDetector.SetActive(false); // Ensure it starts disabled
+			soundDetector.SetActive(false);
 		}
 	}
 
@@ -32,10 +33,8 @@ public class PlayerMovement : MonoBehaviour
 			ToggleInventory();
 		}
 
-		// Store previous sprint state
 		wasSprintingLastFrame = isSprinting;
 
-		// Check for sprint input only if player can move
 		if (canMove)
 		{
 			isSprinting = Input.GetKey(KeyCode.LeftShift) && movement.magnitude > 0;
@@ -45,7 +44,6 @@ public class PlayerMovement : MonoBehaviour
 			isSprinting = false;
 		}
 
-		// Only update sound detector when state changes
 		if (isSprinting != wasSprintingLastFrame)
 		{
 			UpdateSoundDetector();
@@ -63,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
 		else
 		{
 			movement = Vector2.zero;
-			if (isSprinting) // Force stop sprinting if can't move
+			if (isSprinting)
 			{
 				isSprinting = false;
 				UpdateSoundDetector();
@@ -79,8 +77,6 @@ public class PlayerMovement : MonoBehaviour
 		if (soundDetector != null)
 		{
 			soundDetector.SetActive(isSprinting);
-
-			// Optional: Adjust collider radius if needed
 			CircleCollider2D collider = soundDetector.GetComponent<CircleCollider2D>();
 			if (collider != null)
 			{
@@ -94,18 +90,7 @@ public class PlayerMovement : MonoBehaviour
 		if (inventoryPanel != null)
 		{
 			bool openingInventory = !inventoryPanel.activeSelf;
-
-			if (openingInventory)
-			{
-				// Normal open behavior
-				inventoryPanel.SetActive(true);
-			}
-			else
-			{
-				// Close inventory and clean up any held items
-				InventoryController.Instance.CloseInventory();
-			}
-
+			inventoryPanel.SetActive(openingInventory);
 			canMove = !inventoryPanel.activeSelf;
 
 			if (inventoryPanel.activeSelf && isSprinting)
@@ -113,6 +98,39 @@ public class PlayerMovement : MonoBehaviour
 				isSprinting = false;
 				UpdateSoundDetector();
 			}
+		}
+	}
+
+	private void LoadGameOverScene(bool killedByEnemy)
+	{
+		if (InventoryController.Instance != null)
+		{
+			if (killedByEnemy)
+			{
+				InventoryController.Instance.ForceSetScore(0);
+			}
+			InventoryController.Instance.FinishGame();
+		}
+		SceneManager.LoadScene(2);
+	}
+
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		if (collision.gameObject.CompareTag("Enemy"))
+		{
+			LoadGameOverScene(true);
+		}
+	}
+
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		if (other.CompareTag("Enemy"))
+		{
+			LoadGameOverScene(true);
+		}
+		else if (other.CompareTag("ExtractionPoint"))
+		{
+			LoadGameOverScene(false);
 		}
 	}
 }

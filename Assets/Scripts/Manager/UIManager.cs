@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 [RequireComponent(typeof(EventTrigger))]
 public class UIManager : MonoBehaviour
@@ -12,41 +13,59 @@ public class UIManager : MonoBehaviour
 		public Image buttonImage;
 		public Sprite normalSprite;
 		public Sprite pressedSprite;
+		[HideInInspector] public Button buttonComponent;
 	}
 
 	public ButtonSetup startButton;
 	public ButtonSetup scoreButton;
 	public ButtonSetup exitButton;
+	public ButtonSetup backButton;
+	public ButtonSetup confirmButton;
+	public GameObject nameInputPanel;
+	public TMP_InputField nameInputField;
+	public GameObject mainMenuPanel;
+	private const int MAX_NAME_LENGTH = 20;
 
 	void Start()
 	{
-		SetupButton(startButton, LoadGameScene);
-		SetupButton(scoreButton, ShowScore); // Empty for now
+		nameInputPanel.SetActive(false);
+		mainMenuPanel.SetActive(true);
+
+		SetupButton(startButton, ShowNameInput);
+		SetupButton(scoreButton, ShowScore);
 		SetupButton(exitButton, ExitGame);
+		SetupButton(backButton, BackToMainMenu);
+		SetupButton(confirmButton, ConfirmName);
+
+		confirmButton.buttonComponent.interactable = false;
+		confirmButton.buttonImage.sprite = confirmButton.normalSprite;
+		nameInputField.characterLimit = MAX_NAME_LENGTH;
+		nameInputField.onValueChanged.AddListener(ValidateNameInput);
 	}
 
 	void SetupButton(ButtonSetup buttonSetup, UnityEngine.Events.UnityAction action)
 	{
 		if (buttonSetup.buttonImage == null) return;
 
-		// Set initial sprite
-		buttonSetup.buttonImage.sprite = buttonSetup.normalSprite;
+		buttonSetup.buttonComponent = buttonSetup.buttonImage.GetComponent<Button>() ??
+								   buttonSetup.buttonImage.gameObject.AddComponent<Button>();
 
-		// Add EventTrigger if not exists
+		buttonSetup.buttonImage.sprite = buttonSetup.normalSprite;
+		buttonSetup.buttonComponent.onClick.AddListener(action);
+
 		var eventTrigger = buttonSetup.buttonImage.gameObject.GetComponent<EventTrigger>() ??
 						 buttonSetup.buttonImage.gameObject.AddComponent<EventTrigger>();
 
-		// Create pointer down event
 		var pointerDown = new EventTrigger.Entry
 		{
 			eventID = EventTriggerType.PointerDown,
 			callback = new EventTrigger.TriggerEvent()
 		};
 		pointerDown.callback.AddListener((data) => {
-			buttonSetup.buttonImage.sprite = buttonSetup.pressedSprite;
+			if (buttonSetup.buttonComponent.interactable)
+				buttonSetup.buttonImage.sprite = buttonSetup.pressedSprite;
 		});
 
-		// Create pointer up event
 		var pointerUp = new EventTrigger.Entry
 		{
 			eventID = EventTriggerType.PointerUp,
@@ -56,7 +75,6 @@ public class UIManager : MonoBehaviour
 			buttonSetup.buttonImage.sprite = buttonSetup.normalSprite;
 		});
 
-		// Create pointer exit event
 		var pointerExit = new EventTrigger.Entry
 		{
 			eventID = EventTriggerType.PointerExit,
@@ -66,27 +84,51 @@ public class UIManager : MonoBehaviour
 			buttonSetup.buttonImage.sprite = buttonSetup.normalSprite;
 		});
 
-		// Clear existing triggers and add new ones
 		eventTrigger.triggers.Clear();
 		eventTrigger.triggers.Add(pointerDown);
 		eventTrigger.triggers.Add(pointerUp);
 		eventTrigger.triggers.Add(pointerExit);
+	}
 
-		// Add click functionality
-		var button = buttonSetup.buttonImage.gameObject.GetComponent<Button>() ??
-					buttonSetup.buttonImage.gameObject.AddComponent<Button>();
-		button.onClick.AddListener(action);
+	void ValidateNameInput(string input)
+	{
+		bool isValid = !string.IsNullOrWhiteSpace(input) && input.Length <= MAX_NAME_LENGTH;
+		confirmButton.buttonComponent.interactable = isValid;
+		confirmButton.buttonImage.sprite = isValid ?
+			confirmButton.normalSprite : confirmButton.normalSprite;
+	}
+
+	void ShowNameInput()
+	{
+		mainMenuPanel.SetActive(false);
+		nameInputPanel.SetActive(true);
+		nameInputField.text = "";
+	}
+
+	void ConfirmName()
+	{
+		string playerName = nameInputField.text.Trim();
+		if (!string.IsNullOrEmpty(playerName))
+		{
+			GameManager.Instance.SetPlayerName(playerName);
+			LoadGameScene();
+		}
+	}
+
+	void BackToMainMenu()
+	{
+		nameInputPanel.SetActive(false);
+		mainMenuPanel.SetActive(true);
 	}
 
 	void LoadGameScene()
 	{
-		SceneManager.LoadScene(1); // Load scene with index 1
+		SceneManager.LoadScene(1);
 	}
 
 	void ShowScore()
 	{
-		// Leave this empty as requested
-		Debug.Log("Score button pressed - functionality not implemented");
+		SceneManager.LoadScene(3);
 	}
 
 	void ExitGame()

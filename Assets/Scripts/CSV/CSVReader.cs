@@ -24,7 +24,6 @@ public class CSVReader : MonoBehaviour
 
 		HashSet<string> validItemNames = new HashSet<string>();
 
-		// First pass - collect all valid item names
 		for (int i = 1; i < lines.Length; i++)
 		{
 			if (string.IsNullOrWhiteSpace(lines[i]))
@@ -38,10 +37,8 @@ public class CSVReader : MonoBehaviour
 			validItemNames.Add(itemName);
 		}
 
-		// Clean up unused items
 		CleanUnusedItems(itemFolderPath, validItemNames);
 
-		// Second pass - create/update items
 		for (int i = 1; i < lines.Length; i++)
 		{
 			if (string.IsNullOrWhiteSpace(lines[i]))
@@ -62,7 +59,6 @@ public class CSVReader : MonoBehaviour
 				AssetDatabase.CreateAsset(itemData, assetPath);
 			}
 
-			// Update item properties
 			itemData.itemName = itemName;
 			itemData.width = int.Parse(columns[1].Trim());
 			itemData.height = int.Parse(columns[2].Trim());
