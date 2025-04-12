@@ -7,8 +7,8 @@ public class ItemGrid : MonoBehaviour
 	public const float tileSizeHeight = 97;
 
 	InventoryItem[,] inventoryItemSlot;
-
 	RectTransform rectTransform;
+	Canvas parentCanvas;
 
 	[SerializeField] public int gridSizeWidth = 20;
 	[SerializeField] public int gridSizeHeight = 10;
@@ -16,6 +16,7 @@ public class ItemGrid : MonoBehaviour
 	private void Start()
 	{
 		rectTransform = GetComponent<RectTransform>();
+		parentCanvas = GetComponentInParent<Canvas>();
 		Init(gridSizeWidth, gridSizeHeight);
 	}
 
@@ -53,11 +54,14 @@ public class ItemGrid : MonoBehaviour
 
 	public Vector2Int GetTileGridPosition(Vector2 mousePosition, InventoryItem item = null)
 	{
-		positionOnTheGrid.x = mousePosition.x - rectTransform.position.x;
-		positionOnTheGrid.y = rectTransform.position.y - mousePosition.y;
+		RectTransformUtility.ScreenPointToLocalPointInRectangle(
+			rectTransform,
+			mousePosition,
+			parentCanvas.worldCamera,
+			out positionOnTheGrid);
 
 		tileGridPosition.x = (int)(positionOnTheGrid.x / tileSizeWidth);
-		tileGridPosition.y = (int)(positionOnTheGrid.y / tileSizeHeight);
+		tileGridPosition.y = (int)(-positionOnTheGrid.y / tileSizeHeight); 
 
 		if (item != null)
 		{
