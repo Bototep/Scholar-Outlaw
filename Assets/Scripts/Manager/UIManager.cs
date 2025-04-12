@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour
 	public GameObject mainMenuPanel;
 	private const int MAX_NAME_LENGTH = 20;
 
-	void Start()
+	private void Start()
 	{
 		nameInputPanel.SetActive(false);
 		mainMenuPanel.SetActive(true);
@@ -43,7 +43,7 @@ public class UIManager : MonoBehaviour
 		nameInputField.onValueChanged.AddListener(ValidateNameInput);
 	}
 
-	void SetupButton(ButtonSetup buttonSetup, UnityEngine.Events.UnityAction action)
+	private void SetupButton(ButtonSetup buttonSetup, UnityEngine.Events.UnityAction action)
 	{
 		if (buttonSetup.buttonImage == null) return;
 
@@ -90,7 +90,7 @@ public class UIManager : MonoBehaviour
 		eventTrigger.triggers.Add(pointerExit);
 	}
 
-	void ValidateNameInput(string input)
+	private void ValidateNameInput(string input)
 	{
 		bool isValid = !string.IsNullOrWhiteSpace(input) && input.Length <= MAX_NAME_LENGTH;
 		confirmButton.buttonComponent.interactable = isValid;
@@ -98,14 +98,14 @@ public class UIManager : MonoBehaviour
 			confirmButton.normalSprite : confirmButton.normalSprite;
 	}
 
-	void ShowNameInput()
+	private void ShowNameInput()
 	{
 		mainMenuPanel.SetActive(false);
 		nameInputPanel.SetActive(true);
 		nameInputField.text = "";
 	}
 
-	void ConfirmName()
+	private void ConfirmName()
 	{
 		string playerName = nameInputField.text.Trim();
 		if (!string.IsNullOrEmpty(playerName))
@@ -115,23 +115,23 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
-	void BackToMainMenu()
+	private void BackToMainMenu()
 	{
 		nameInputPanel.SetActive(false);
 		mainMenuPanel.SetActive(true);
 	}
 
-	void LoadGameScene()
+	private void LoadGameScene()
 	{
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene(4);
 	}
 
-	void ShowScore()
+	private void ShowScore()
 	{
 		SceneManager.LoadScene(3);
 	}
 
-	void ExitGame()
+	private void ExitGame()
 	{
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
