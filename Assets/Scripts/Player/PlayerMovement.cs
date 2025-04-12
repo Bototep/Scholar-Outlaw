@@ -160,6 +160,11 @@ public class PlayerMovement : MonoBehaviour
 			else
 			{
 				Time.timeScale = 1f;
+				if (InventoryController.Instance != null && InventoryController.Instance.selectedItem != null)
+				{
+					Destroy(InventoryController.Instance.selectedItem.gameObject);
+					InventoryController.Instance.selectedItem = null;
+				}
 			}
 
 			if (inventoryPanel.activeSelf && isSprinting)

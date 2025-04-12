@@ -50,25 +50,17 @@ public class InventoryController : MonoBehaviour
 	{
 		ItemIconDrag();
 
-		/*if (Input.GetKeyDown(KeyCode.J))
+		if (Input.GetKeyDown(KeyCode.X) && selectedItem != null)
 		{
-			if (selectedItem == null) CreateRandomItem();
-		}*/
-
-		/*if (Input.GetKeyDown(KeyCode.K))
-		{
-			InsertRandomItem();
-		}*/
+			Destroy(selectedItem.gameObject);
+			selectedItem = null;
+			return;
+		}
 
 		if (Input.GetKeyDown(KeyCode.R))
 		{
 			RotateItem();
 		}
-
-		/*if (Input.GetKeyDown(KeyCode.L))
-		{
-			CalculateTotalInventoryValue();
-		}*/
 
 		if (selectedItemGrid == null)
 		{
@@ -83,13 +75,16 @@ public class InventoryController : MonoBehaviour
 			if (selectedItem != null)
 			{
 				Vector2Int gridPos = GetTileGridPosition();
-				if (selectedItemGrid == null ||
-					!selectedItemGrid.BoundryCheck(gridPos.x, gridPos.y, selectedItem.WIDTH, selectedItem.HEIGHT))
+
+				bool mouseInGrid = IsMouseInGridBounds();
+
+				if (!mouseInGrid)
 				{
 					Destroy(selectedItem.gameObject);
 					selectedItem = null;
 				}
-				else
+				else if (selectedItemGrid.BoundryCheck(gridPos.x, gridPos.y,
+						 selectedItem.WIDTH, selectedItem.HEIGHT))
 				{
 					LeftMouseButtonPress();
 				}
@@ -99,6 +94,20 @@ public class InventoryController : MonoBehaviour
 				LeftMouseButtonPress();
 			}
 		}
+	}
+
+	private bool IsMouseInGridBounds()
+	{
+		if (selectedItemGrid == null) return false;
+
+		Vector2 mousePosition = Input.mousePosition;
+		RectTransform gridRect = selectedItemGrid.GetComponent<RectTransform>();
+
+		Vector2 localMousePosition;
+		RectTransformUtility.ScreenPointToLocalPointInRectangle(
+			gridRect, mousePosition, null, out localMousePosition);
+
+		return gridRect.rect.Contains(localMousePosition);
 	}
 
 	private void RotateItem()
