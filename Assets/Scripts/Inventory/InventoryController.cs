@@ -50,25 +50,25 @@ public class InventoryController : MonoBehaviour
 	{
 		ItemIconDrag();
 
-		if (Input.GetKeyDown(KeyCode.J))
+		/*if (Input.GetKeyDown(KeyCode.J))
 		{
 			if (selectedItem == null) CreateRandomItem();
-		}
+		}*/
 
-		if (Input.GetKeyDown(KeyCode.K))
+		/*if (Input.GetKeyDown(KeyCode.K))
 		{
 			InsertRandomItem();
-		}
+		}*/
 
 		if (Input.GetKeyDown(KeyCode.R))
 		{
 			RotateItem();
 		}
 
-		if (Input.GetKeyDown(KeyCode.L))
+		/*if (Input.GetKeyDown(KeyCode.L))
 		{
 			CalculateTotalInventoryValue();
-		}
+		}*/
 
 		if (selectedItemGrid == null)
 		{

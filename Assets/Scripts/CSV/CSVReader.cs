@@ -10,7 +10,6 @@ public class CSVReader : MonoBehaviour
 	[ContextMenu("Load CSV Data")]
 	public void LoadCSVData()
 	{
-		// This method should only work in the Editor
 #if UNITY_EDITOR
 		if (csvFile == null)
 		{

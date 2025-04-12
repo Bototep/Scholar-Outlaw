@@ -35,9 +35,9 @@ public class CountDown : MonoBehaviour
 
 	private IEnumerator CountdownRoutine()
 	{
-		while (currentTime > 0 && isRunning)
+		while (currentTime > 0)
 		{
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSecondsRealtime(1f);
 			currentTime -= 1f;
 			UpdateTimeDisplay();
 

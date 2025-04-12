@@ -347,7 +347,16 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      carpet_red_001_0: 2586066334136652785
+      carpet_red_001_1: 1631307228992914001
+      carpet_red_001_2: -3471499029762921506
+      carpet_red_001_3: -3539489570612350906
+      carpet_red_001_4: -7811080882226203040
+      carpet_red_001_5: 6588781281762116276
+      carpet_red_001_6: 5032986947503110077
+      carpet_red_001_7: -8912415553967215860
+      carpet_red_001_8: -1633388693650703258
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

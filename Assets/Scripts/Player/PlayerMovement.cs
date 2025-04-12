@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
 	public float sprintSpeed = 8f;
 	public bool canMove = true;
 	public GameObject inventoryPanel;
+	public CountDown countDown;
 
 	[Header("Sound Detection")]
 	public GameObject soundDetector;
@@ -46,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.I))
+		if (Input.GetKeyDown(KeyCode.Tab))
 		{
 			ToggleInventory();
 		}
@@ -150,6 +151,15 @@ public class PlayerMovement : MonoBehaviour
 			if (SoundManager.Instance != null)
 			{
 				SoundManager.Instance.Play(SoundType.Bonus);
+			}
+
+			if (inventoryPanel.activeSelf)
+			{
+				Time.timeScale = 0f;
+			}
+			else
+			{
+				Time.timeScale = 1f;
 			}
 
 			if (inventoryPanel.activeSelf && isSprinting)
